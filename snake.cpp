@@ -5,14 +5,14 @@
 #include <cstdlib>
 using namespace std;
  
- // g++ arquivo.cpp -lallegro -lallegro_image
+ // g++ snake.cpp -lallegro -lallegro_image
  //./a.exe
 
-const float FPS = 6;
+const float FPS = 5;
 const int SCREEN_W = 500;
 const int SCREEN_H = 500;
 const int QUAD_SIZE = 20;
-const int FRUTA_SIZE = 10;
+
 
 
 char MAPA[26][26] =
@@ -53,7 +53,8 @@ ALLEGRO_EVENT_QUEUE *event_queue = NULL;
 ALLEGRO_TIMER *timer = NULL;
 ALLEGRO_BITMAP *mapa   = NULL;
 ALLEGRO_BITMAP *quad = NULL;
-ALLEGRO_BITMAP *fruta = NULL;
+ALLEGRO_BITMAP *fruta = NULL; //cria a frutiha
+ALLEGRO_BITMAP *especial = NULL; //cria o inseto
 
 int i = 15, j = 12;   //posicao inicial da Snake na matriz
 int q = 20;           //tamanho de cada celula no mapa
@@ -110,14 +111,14 @@ int inicializa() {
     }
     al_draw_bitmap(mapa,0,0,0);
 
-    quad = al_create_bitmap(QUAD_SIZE, QUAD_SIZE);	
-    fruta = al_create_bitmap(FRUTA_SIZE, FRUTA_SIZE);	
+    quad = al_create_bitmap(QUAD_SIZE, QUAD_SIZE);		
     if(!quad)
     {
         al_destroy_display(display);
         al_destroy_timer(timer);
         return -1;
     }
+    fruta = al_load_bitmap("cereja.tga"); 
     if(!fruta)
     {
         al_destroy_display(display);
@@ -128,8 +129,7 @@ int inicializa() {
     al_set_target_bitmap(quad);                    //muda destino dos desenhos para o bitmap quad
     al_clear_to_color(al_map_rgb(0, 200, 0));       //limpa e colore de magenta
                                                  //muda de volta o destino dos desenhos para o display
-    al_set_target_bitmap(fruta);
-    al_clear_to_color(al_map_rgb(200, 0, 0));       //limpa e colore de magenta
+    al_draw_bitmap(fruta,0,0,0);       
     al_set_target_bitmap(al_get_backbuffer(display));
 
     event_queue = al_create_event_queue();
@@ -140,6 +140,7 @@ int inicializa() {
         al_destroy_bitmap(fruta);
         al_destroy_display(display);
         al_destroy_timer(timer);
+        al_destroy_bitmap(especial);
         return 0;
     }
 
@@ -164,13 +165,13 @@ int main(int argc, char **argv)
     dir = false;
 
     srand(time(0));
-    int ifruta=(rand()%23)+1,jfruta=(rand()%23)+1; //posicao aleatoria da fruta
-
-    int iparede= i;
-    int jparede= j; 
+    int ifruta=(rand()%23)+1,jfruta=(rand()%23)+1; //posicao aleatoria da fruta e inseto
+    int iespecial=(rand()%23)+1;
+    int jespecial=(rand()%23)+1;  
     int vet[500000]; //vetor para guardar posicoes da cobrinha
     int compara=-2;//i e j da parede coso a cobrinha encoste
     int corpo=3; //tamanho cobrinha
+    int contespecial=0; //contador para o inseto
      
 
     while(!sair){
@@ -331,7 +332,7 @@ int main(int argc, char **argv)
 
             al_draw_bitmap(mapa,0,0,0);
             int cont=-1;  
-            int comeu=0; 
+            bool comeu=false; 
             for(int i=0;i<26;i++)
                 for(int j=0;j<26;j++)
                     if(andou[i][j]>0 && andou[i][j]>=passo-corpo-1){
@@ -339,26 +340,50 @@ int main(int argc, char **argv)
                         vet[cont*2]=j;
                         vet[cont*2+1]=i;
                         if(j==jfruta&&i==ifruta) //cobrinha comeu a fruta
-                            comeu=1;
+                            comeu=true;
                         al_draw_bitmap(quad,j*q,i*q,0);   //desenha quadrado
                     }
             if(comeu){
-                pontuacao++;
-                corpo++;
-                int teste=1;
+                pontuacao++; //aumenta a pontuação
+                corpo++;    //aumenta o tamanho da cobra
+                bool teste=true;
                 int k;
                 while(teste){  
-                    teste=0;
+                    teste=false;
                     ifruta=(rand()%23)+1; //gera posicao aleatoria para fruta
                     jfruta=(rand()%23)+1;
                     
-                    for(k=cont*3;k>=1;k=k-2){
+                    for(k=cont*2+1;k>=1;k=k-2){
 
                         if(ifruta==vet[k]&&jfruta==vet[k-1]){   //posicao da fruta == posicao da cobrinha
-                            teste=1;
+                            teste=true;
                 }}}
             }
-            al_draw_bitmap(fruta,jfruta*q,ifruta*q,0); //desenha fruta
+            al_draw_bitmap(fruta,jfruta*q,ifruta*q,0); //desenha a frutinha
+            if (contespecial==99){
+                bool teste= true ;
+                while (teste){  
+                    teste= false ;
+                    iespecial= rand ()% 23 + 1 ; // gera posicao aleatória para o inseto
+                    jespecial= rand ()% 23 + 1 ;
+                    for (int k=cont*2+1;k>=1;k-=2) 
+                        if ((iespecial==vet[k]&&jespecial==vet[k-1]) || (iespecial==ifruta && jespecial==jfruta)) //caso teste para a mesma posicao da fruta e inseto
+                            teste=true;
+                            }
+                contespecial++; //contador para o inseto
+            }
+            else  if (contespecial== 100 ){ 
+                especial = al_load_bitmap ( "abelha.tga" ); //cria o inseto 
+                al_draw_bitmap (especial,jespecial*q,iespecial*q, 0 ); 
+                if (j==jespecial&&i==iespecial){ 
+                    pontuacao+=3; //cada inseto equivale a 3 frutas
+                    corpo+=3 ;
+                    contespecial=0 ;
+                    }
+            }
+            else{   
+                contespecial++;
+                } 
             if(compara>cont){ //a cobrinha encostou no seu proprio corpo
                 sair=true;
             }
@@ -375,5 +400,6 @@ int main(int argc, char **argv)
     al_destroy_timer(timer);
     al_destroy_display(display);
     al_destroy_event_queue(event_queue);
+    al_destroy_bitmap(especial);
     return 0;
 }
