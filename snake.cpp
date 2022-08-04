@@ -512,7 +512,7 @@ int main(int argc, char **argv)
                 bool comeu=false; //booleano da snake comer uma cereja incia falso
                 for(int i=0;i<26;i++)
                     for(int j=0;j<26;j++)
-                        if(andou[i][j]>0 && andou[i][j]>=passo-4){
+                        if(andou[i][j]>0 && andou[i][j]>=passo-corpo-1){
                             contpassou++;//aumenta o contador a cada "passo"
                             j=passou[contpassou*2]; 
                             i=passou[contpassou*2+1];
