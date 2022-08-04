@@ -508,16 +508,15 @@ int main(int argc, char **argv)
                 al_clear_to_color(al_map_rgb(0,0,0));
 
                 al_draw_bitmap(mapa,0,0,0);
-                int contpassou=1;  //contador para inicializar o vetor, descontando o pixel das margens
+                int contpassou=0;  //contador para inicializar o vetor, descontando o pixel das margens
                 bool comeu=false; //booleano da snake comer uma cereja incia falso
                 for(int i=0;i<26;i++)
                     for(int j=0;j<26;j++)
                         if(andou[i][j]>0 && andou[i][j]>=passo-corpo-1){
+                            i=passou[contpassou]; 
+                            j=passou[contpassou];
                             contpassou++;//aumenta o contador a cada "passo"
-                            j=passou[contpassou*2]; 
-                            i=passou[contpassou*2+1];
-                            
-                            if(j==jfruta&&i==ifruta) //cobrinha encontrou a cereja
+                            if(i==ifruta && j==jfruta) //cobrinha encontrou a cereja
                                 comeu=true; //cobrinha comeu a fruta
                                  
                             al_draw_bitmap(quad,j*q,i*q,0);   //desenha quadrado
@@ -528,34 +527,34 @@ int main(int argc, char **argv)
                     corpo++;    //aumenta o tamanho da cobra
                     velocidade += 1; //velocidade aumenta a cada cereja colhida
                     
-                    while(testefruta){  //enquanto o teste nao der negativo uma nova cereja nao eh criada  
+                    do{  //enquanto o teste nao der negativo uma nova cereja nao eh criada  
                         testefruta=false; //apos a cobra comer uma cereja uma nova posicao eh sorteada
                         ifruta=(rand()%23)+1; //gera posicao aleatoria para fruta
                         jfruta=(rand()%23)+1;
                         
                         for((c=contpassou*2)+1;c>=1;c=c-2){
 
-                            if(ifruta==passou[c]&&jfruta==passou[c-1]){   //posicao da fruta == posicao da cobrinha
+                            if(ifruta == passou[c] && jfruta == passou[c-1]){   //posicao da fruta == posicao da cobrinha
                                 testefruta=true;// se for gera uma nova posicao
-                    }}}
+                    }}}while(testefruta);
                 }
                 al_draw_bitmap(fruta,jfruta*q,ifruta*q,0); //desenha a frutinha
                 if (contabelha==looping-1){
-                    while (testeabelha){  
+                    do{  
                         testeabelha= false ;
-                        iabelha= rand ()% 23 + 1 ; // gera posicao aleatória para a abelha
-                        jabelha= rand ()% 23 + 1 ;
+                        iabelha= (rand()%23) + 1 ; // gera posicao aleatória para a abelha
+                        jabelha= (rand()% 23) + 1 ;
                         for (a=(contpassou*2)+1;a>=1;a=a-2)  //mesmo caso da cereja
-                            if ((iabelha==passou[a]&&jabelha==passou[a-1]) || (iabelha==ifruta && jabelha==jfruta)) 
+                            if ((iabelha == passou[a] && jabelha == passou[a-1]) || (iabelha==ifruta && jabelha==jfruta)) 
                                //caso teste para a mesma posicao da fruta e inseto
                                 testeabelha=true;
-                                }
+                                }while (testeabelha);
                     contabelha++; //contador da abelha acumula um valor com inicio 0
                 }
                 else  if (contabelha== looping ){ //quando o jogo atinge o valor estipulado de "voltas"
                     abelha = al_load_bitmap ( "abelha.tga" );//desenha a abelha 
                     al_draw_bitmap (abelha,jabelha*q,iabelha*q, 0 ); //desenha a abelha na malha do jogo 
-                    if (j==jabelha&&i==iabelha){ //se a posicao da cabeca da cobra for a mesma da abelha
+                    if (j==jabelha && i==iabelha){ //se a posicao da cabeca da cobra for a mesma da abelha
                         al_play_sample(bonus, 1.0, 0.0, 1.0, ALLEGRO_PLAYMODE_ONCE, NULL);
                         pontuacao = pontuacao + 50; //cada inseto equivale a 5 frutas
                         corpo=corpo+3 ;//o corpo da cobra aumenta 3 unidades
