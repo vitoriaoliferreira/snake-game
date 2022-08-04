@@ -292,7 +292,7 @@ int main(int argc, char **argv)
     int iabelha=(rand()%23)+1; //posicao aleatoria da abelha
     int jabelha=(rand()%23)+1;  
     int passou[500000]; //vetor para guardar posicoes da cobrinha
-    int compara=0;// qtde de quadrados no corpo da snake
+    int compara=-2;// qtde de quadrados no corpo da snake
     int corpo=3; //tamanho cobrinha
     int contabelha=0; //contador para o inseto, que acrescenta um valor para cada vez que o jogo "roda" o codigo
      
@@ -508,13 +508,13 @@ int main(int argc, char **argv)
                 al_clear_to_color(al_map_rgb(0,0,0));
 
                 al_draw_bitmap(mapa,0,0,0);
-                int contpassou=0;  //contador para inicializar o vetor, descontando o pixel das margens
+                int contpassou=-1;  //contador para inicializar o vetor, descontando o pixel das margens
                 bool comeu=false; //booleano da snake comer uma cereja incia falso
                 for(int i=0;i<26;i++)
                     for(int j=0;j<26;j++)
                         if(andou[i][j]>0 && andou[i][j]>=passo-corpo-1){
-                            i=passou[contpassou]; 
-                            j=passou[contpassou];
+                            i=passou[contpassou*2]; 
+                            j=passou[contpassou*2+1];
                             contpassou++;//aumenta o contador a cada "passo"
                             if(i==ifruta && j==jfruta) //cobrinha encontrou a cereja
                                 comeu=true; //cobrinha comeu a fruta
