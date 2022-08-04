@@ -286,13 +286,13 @@ int main(int argc, char **argv)
     esq = false;
     dir = false;
    
-
+    int looping=100;
     srand(time(0));//inicializa a funcao rand
     int ifruta=(rand()%23)+1,jfruta=(rand()%23)+1; //posicao aleatoria da fruta
     int iabelha=(rand()%23)+1; //posicao aleatoria da abelha
     int jabelha=(rand()%23)+1;  
     int passou[500000]; //vetor para guardar posicoes da cobrinha
-    int compara=-2;// qtde de quadrados no corpo da snake
+    int compara=0;// qtde de quadrados no corpo da snake
     int corpo=3; //tamanho cobrinha
     int contabelha=0; //contador para o inseto, que acrescenta um valor para cada vez que o jogo "roda" o codigo
      
@@ -508,11 +508,11 @@ int main(int argc, char **argv)
                 al_clear_to_color(al_map_rgb(0,0,0));
 
                 al_draw_bitmap(mapa,0,0,0);
-                int contpassou=-1;  //contador para inicializar o vetor, descontando o pixel das margens
+                int contpassou=1;  //contador para inicializar o vetor, descontando o pixel das margens
                 bool comeu=false; //booleano da snake comer uma cereja incia falso
                 for(int i=0;i<26;i++)
                     for(int j=0;j<26;j++)
-                        if(andou[i][j]>0 && andou[i][j]>=passo-corpo-1){
+                        if(andou[i][j]>0 && andou[i][j]>=passo-4){
                             contpassou++;//aumenta o contador a cada "passo"
                             j=passou[contpassou*2]; 
                             i=passou[contpassou*2+1];
@@ -540,20 +540,19 @@ int main(int argc, char **argv)
                     }}}
                 }
                 al_draw_bitmap(fruta,jfruta*q,ifruta*q,0); //desenha a frutinha
-                if (contabelha==99){//quando o contador atinge o valor de 99 que ocorre quando o jogo da 99 "voltas" 
-                
+                if (contabelha==looping-1){
                     while (testeabelha){  
                         testeabelha= false ;
                         iabelha= rand ()% 23 + 1 ; // gera posicao aleatória para a abelha
                         jabelha= rand ()% 23 + 1 ;
-                        for (a=(contpassou*2)+1;a>=1;a-=2)  //mesmo caso da cereja
+                        for (a=(contpassou*2)+1;a>=1;a=a-2)  //mesmo caso da cereja
                             if ((iabelha==passou[a]&&jabelha==passou[a-1]) || (iabelha==ifruta && jabelha==jfruta)) 
                                //caso teste para a mesma posicao da fruta e inseto
                                 testeabelha=true;
                                 }
                     contabelha++; //contador da abelha acumula um valor com inicio 0
                 }
-                else  if (contabelha== 100 ){ //quando o contador atinge o valor de 100 que ocorre quando o jogo da 100 "voltas" uma abelha eh desenhada no mapa 
+                else  if (contabelha== looping ){ //quando o jogo atinge o valor estipulado de "voltas"
                     abelha = al_load_bitmap ( "abelha.tga" );//desenha a abelha 
                     al_draw_bitmap (abelha,jabelha*q,iabelha*q, 0 ); //desenha a abelha na malha do jogo 
                     if (j==jabelha&&i==iabelha){ //se a posicao da cabeca da cobra for a mesma da abelha
